@@ -99,6 +99,16 @@ void ArmToHack::translate(string &line)
     {
         translateCMP(line);
     }
+
+    else if (token == "END")
+    {
+        translateEND(line);
+    }
+
+    else if (token[0] == 'B')
+    {
+        translateJumps(line);
+    }
 }
 
 void ArmToHack::translateMOV(string &line)
@@ -205,7 +215,12 @@ void ArmToHack::translateCMP(string &line)
 
 void ArmToHack::translateEND(string &line)
 {
+    int jumpLine = lineNum + 1;
+    string address = to_string(jumpLine);
 
+    // jump onto jump_line address cell unconditionally
+    write_line("@" + address);
+    write_line("0;JMP");
 }
 
 void ArmToHack::write_oper2(string &token)
@@ -238,7 +253,40 @@ void ArmToHack::write_oper2(string &token)
 
 void ArmToHack::translateJumps(string &line)
 {
+    string jumpType = peek_first(line);
+    string label = peek_second(line);
+    string labelAddress = labelMap[label];
 
+    if (jumpType == "BL")
+    {
+        // Save return address in LR (R14)
+        
+        write_line("@" + to_string(lineNum + 6)); // it takes 6 more lines to write equivalence of "BL" arm command!
+        write_line("D=A");
+        write_line("@14");
+        write_line("M=D");
+    }
+
+    if (labelAddress.empty())
+    {
+        labelFixupMap[to_string(lineNum)] = label;
+        write_line("@-1");
+    }
+
+    else
+    {
+        write_line("@" + labelAddress);
+    }
+
+    if (jumpType == "BL" || jumpType == "BAL")
+    {
+        write_line("0;JMP");
+    }
+
+    else
+    {
+        write_line("D;" + jumpMap[jumpType]);
+    }
 }
 
 void ArmToHack::translateSecondPass(const string &inFileName, const string &outFileName)
