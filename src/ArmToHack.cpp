@@ -291,12 +291,37 @@ void ArmToHack::translateJumps(string &line)
 
 void ArmToHack::translateSecondPass(const string &inFileName, const string &outFileName)
 {
+    inputFile.open(inFileName);
+    outputFile.open(outFileName);
 
+    while (inputFile)
+    {
+        string curLine = read_line(inputFile);
+
+        if (peek_first(curLine) == "@-1")
+        {
+            string label = labelFixupMap[to_string(lineNum)];
+            write_line("@" + labelMap[label]);
+        }
+
+        else
+        {
+            write_line(curLine);
+        }
+    }
+
+    inputFile.close();
+    outputFile.close();
 }
 
 void ArmToHack::write_pcjump(const string &regRd)
 {
-
+    if (regMap[regRd] == regMap["PC"])
+    {
+        write_line("@15");
+        write_line("A=M");
+        write_line("0;JMP");
+    }
 }
 
 void ArmToHack::translateSTACK(const string &address)
