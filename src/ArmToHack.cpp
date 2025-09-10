@@ -29,7 +29,13 @@ void ArmToHack::write_line(const string &line)
 
 void ArmToHack::translate(const string &inFileName, const string &outFileName)
 {
+    string tempFileName = inFileName + ".tmp";
 
+    translateFirstPass(inFileName, tempFileName);
+    lineNum = 0;
+    translateSecondPass(tempFileName, outFileName);
+
+    reset();
 }
 
 void ArmToHack::translateFirstPass(const string &inFileName, const string &outFileName)
