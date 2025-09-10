@@ -40,7 +40,35 @@ void ArmToHack::translate(const string &inFileName, const string &outFileName)
 
 void ArmToHack::translateFirstPass(const string &inFileName, const string &outFileName)
 {
+    inputFile.open(inFileName);
+    outputFile.open(outFileName);
 
+    // initialize the stack
+    translateSTACK(DEFAULT_STACK_ADDRESS);
+
+    while (inputFile)
+    {
+        string curLine = read_line(inputFile);
+
+        if (!curLine.empty() && curLine[0] != ';')
+        {
+            if (peek_first(curLine) != "END" && peek_second(curLine).empty())
+            {
+                string key = peek_first(curLine);
+                string value = to_string(lineNum);
+
+                labelMap[key] = value;
+            }
+
+            else
+            {
+                translate(curLine);
+            }
+        }
+    }
+
+    inputFile.close();
+    outputFile.close();
 }
 
 void ArmToHack::translate(string &line)
