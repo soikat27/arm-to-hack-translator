@@ -13,12 +13,18 @@ ArmToHack::ArmToHack()
 
 void ArmToHack::reset()
 {
+    lineNum = 0;
 
+    labelMap.clear();
+    labelFixupMap.clear();
+    arrayBaseMap.clear();
 }
 
 void ArmToHack::write_line(const string &line)
 {
+    outputFile << line << endl;
 
+    lineNum++;
 }
 
 void ArmToHack::translate(const string &inFileName, const string &outFileName)
