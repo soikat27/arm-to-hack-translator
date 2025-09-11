@@ -135,6 +135,11 @@ void ArmToHack::translate(string &line)
     {
         translateDCD(line);
     }
+
+    else if (token == "ASR")
+    {
+        translateASR(line);
+    }
 }
 
 void ArmToHack::translateMOV(string &line)
