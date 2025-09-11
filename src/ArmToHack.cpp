@@ -526,5 +526,51 @@ void ArmToHack::translateDCD(string &line)
 
 void ArmToHack::translateASR(string &line)
 {
+    extract_token(line);
 
+    string dest = extract_token(line);
+    string shiftReg = extract_token(line);
+
+    // set SP=[shiftReg] & result/SP-1 = 0
+    write_line("@" + regMap[shiftReg]);
+    write_line("D=M");
+    write_line("@" + regMap["SP"]);
+    write_line("A=M");
+    write_line("M=D");
+
+    write_line("A=A-1");
+    write_line("M=0");
+
+    // check condition/loop starts
+    write_line("@" + regMap["SP"]);
+    write_line("A=M");
+    write_line("D=M");
+    write_line("@2");
+    write_line("D=D-A");
+    write_line("@" + to_string(lineNum + 11));
+    write_line("D;JLT");
+
+    // inside loop
+    write_line("@2");
+    write_line("D=A");
+    write_line("@" + regMap["SP"]);
+    write_line("A=M");
+    write_line("M=M-D");
+
+    write_line("A=A-1");
+    write_line("M=M+1");
+
+    // jumpBack to loop
+    write_line("@" + to_string(lineNum - 14));
+    write_line("0;JMP");
+
+    // END/put back from temp working cells to desired cells
+    write_line("@" + regMap["SP"]);
+    write_line("A=M-1");
+    write_line("D=M");
+    write_line("@" + regMap[dest]);
+    write_line("M=D");
+
+    // if dest is pc-equiv
+    write_pcjump(dest);
 }
