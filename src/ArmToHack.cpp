@@ -74,6 +74,7 @@ void ArmToHack::translateFirstPass(const string &inFileName, const string &outFi
 void ArmToHack::translate(string &line)
 {
     string token = peek_first(line);
+    string dcdToken = peek_second(line);
 
     if (token == "MOV")
     {
@@ -108,6 +109,31 @@ void ArmToHack::translate(string &line)
     else if (token[0] == 'B')
     {
         translateJumps(line);
+    }
+
+    else if (token == "STMDA")
+    {
+        translateSTMDA(line);
+    }
+
+    else if (token == "LDMIB")
+    {
+        translateLDMIB(line);
+    }
+
+    else if (token == "LDR")
+    {
+        translateLDR(line);
+    }
+
+    else if (token == "STR")
+    {
+        translateSTR(line);
+    }
+
+    else if (dcdToken == "DCD")
+    {
+        translateDCD(line);
     }
 }
 
@@ -326,32 +352,176 @@ void ArmToHack::write_pcjump(const string &regRd)
 
 void ArmToHack::translateSTACK(const string &address)
 {
-
+    write_line("@" + address);
+    write_line("D=A");
+    write_line("@" + regMap["SP"]);
+    write_line("M=D");
 }
 
 void ArmToHack::translateSTMDA(string &line)
 {
-  
+    extract_token(line);
+
+    string base = extract_token(line);
+    strip(base, "!");
+
+    string regList = line;
+    strip(regList, "{}");
+
+    while (!regList.empty())
+    {
+        string curReg = extract_token(regList);
+
+        // store curReg in D
+        write_line("@" + regMap[curReg]);
+        write_line("D=M");
+
+        // store D in baseReg
+        write_line("@" + regMap[base]);
+        write_line("A=M");
+        write_line("M=D");
+
+        // decrease base(move up)
+        write_line("@" + regMap[base]);
+        write_line("M=M-1");
+    }
 }
 
 void ArmToHack::translateLDMIB(string &line)
 {
+    extract_token(line);
 
+    string base = extract_token(line);
+    strip(base, "!");
+
+    string regList = line;
+    strip(regList, "{}");
+
+    while (!regList.empty())
+    {
+        string curReg = extract_token_reverse(regList); // because curReg points to the last listed reg
+
+        // increase base(move down)
+        write_line("@" + regMap[base]);
+        write_line("M=M+1");
+
+        // load value from [base] into D
+        write_line("@" + regMap[base]);
+        write_line("A=M");
+        write_line("D=M");
+
+        // store D in curReg
+        write_line("@" + regMap[curReg]);
+        write_line("M=D");
+    }
 }
 
 void ArmToHack::translateLDR(string &line)
 {
+    extract_token(line);
 
+    string dest = extract_token(line);
+
+    string src = line;
+
+    if (src[0] == '=')
+    {
+        strip(src, "=");
+
+        write_line("@" + arrayBaseMap[src]);
+        write_line("D=A");
+        write_line("@" + regMap[dest]);
+        write_line("M=D");
+    }
+
+    else
+    {
+        strip(src, "[]");
+
+        string base = extract_token(src);
+        string index = extract_token(src);
+
+        // computer final index & store src in D
+        write_oper2(index);
+        write_line("@" + regMap[base]);
+        write_line("A=M+D");
+
+        write_line("D=M");
+
+        // store in dest
+        write_line("@" + regMap[dest]);
+        write_line("M=D");
+    }
+
+    // if dest is pc-equiv
+    write_pcjump(dest);
 }
 
 void ArmToHack::translateSTR(string &line)
 {
+    extract_token(line);
 
+    string src = extract_token(line);
+
+    string dest = line;
+    strip(dest, "[]");
+
+    string base = extract_token(dest);
+    string index = extract_token(dest);
+
+    // compute final index
+    write_oper2(index);
+    write_line("@" + regMap[base]);
+    write_line("D=M+D");
+
+    // store index in temp/M[SP] cell
+    write_line("@" + regMap["SP"]);
+    write_line("A=M");
+    write_line("M=D");
+
+    // load src in D
+    write_line("@" + regMap[src]);
+    write_line("D=M");
+
+    // store src/D in M[final address]
+    write_line("@13");
+    write_line("A=M");
+    write_line("A=M");
+    write_line("M=D");
 }
 
 void ArmToHack::translateDCD(string &line)
 {
+    string arrayName = extract_token(line);
+    extract_token(line);
+    arrayBaseMap[arrayName] = to_string(nextDCDAddress);
 
+    string array = line;
+
+    while (!array.empty())
+    {
+        string curValue = extract_token(array);
+        strip(curValue, "+");
+
+        if (curValue[0] == '-')
+        {
+            strip(curValue, "-");
+
+            write_line("@" + curValue);
+            write_line("D=-A");
+        }
+
+        else
+        {
+            write_line("@" + curValue);
+            write_line("D=A");
+        }
+
+        write_line("@" + to_string(nextDCDAddress));
+        write_line("M=D");
+
+        nextDCDAddress++;
+    }
 }
 
 void ArmToHack::translateASR(string &line)
