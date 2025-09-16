@@ -22,7 +22,9 @@ Check that your compiler works:
 
 ```
 clang++ --version
-# or
+```
+or
+```
 g++ --version
 ```
 
@@ -31,7 +33,7 @@ g++ --version
 1. Clone this repository:
 
 ```
-git clone https://github.com/your-username/armToHack-Translator.git
+git clone https://github.com/your_username/armToHack-Translator.git
 
 cd ArmToHack-Translator
 ```
