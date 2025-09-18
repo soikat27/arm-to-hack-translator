@@ -22,7 +22,9 @@ Check that your compiler works:
 
 ```
 clang++ --version
-# or
+```
+or
+```
 g++ --version
 ```
 
