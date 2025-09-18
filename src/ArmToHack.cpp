@@ -1,7 +1,9 @@
 #include "../include/ArmToHack.h"
+#include "../include/token_io.h"
 
 #include <string>
 #include <iostream>
+#include <cstdio> // for file deletion
 using namespace std;
 
 // constructor
@@ -36,6 +38,9 @@ void ArmToHack::translate(const string &inFileName, const string &outFileName)
     translateSecondPass(tempFileName, outFileName);
 
     reset();
+
+    // delete the tempFile from disc
+    remove (tempFileName.c_str());
 }
 
 void ArmToHack::translateFirstPass(const string &inFileName, const string &outFileName)

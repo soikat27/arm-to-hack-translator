@@ -8,7 +8,7 @@ It is especially helpful for students or developers working with the Hack platfo
 
 ## Getting Started
 
-Follow these steps below to get the project running on your computer.
+Follow these steps below to get the project running on your computer:
 
 ### Prerequisites
 
@@ -28,33 +28,31 @@ g++ --version
 
 ### Installing
 
-1. Clone this repository:
+#### 1. Clone this repository and Navigate to the project directory:
 
 ```
 git clone https://github.com/your-username/armToHack-Translator.git
+```
 
+```
 cd ArmToHack-Translator
 ```
 
-2. Create a folder for the compiled program:
+#### 2. Compile the program:
+
+* Create a folder for the compiled program:
 
 ```
 mkdir bin
 ```
 
-3. Compile the program:
+* Compile the source code into the executable file:
 
 ```
 clang++ src/*.cpp utils/*.cpp -o bin/translator
 ```
 
-4. Run it with an input ARM file (ex: program1.arm) and the output Hack file (ex: program1.asm) you want:
-
-```
-./bin/translator test/program23.arm test/program23.asm
-```
-
-## Running the tests
+## Running the program
 
 The test/ folder contains sample ARM programs you can use to check the translation.
 
@@ -64,20 +62,22 @@ Example:
 ./bin/translator test/binarySearch.arm test/binarySearch.asm
 ```
 
-Open the .asm file to see the generated Hack instructions.
-
-## Usage
+#### Usage:
 
 The program expects two command-line arguments:
 
 1. Input ARM file – the path to the .arm file to translate
 2. Output Hack file – the path to save the resulting .asm file
 
+Run it with an input ARM file (ex: program1.arm) and the output Hack file (ex: program1.asm) you want. 
+
 Example:
 
 ```
-./bin/translator test/binarySearch.arm test/binarySearch.asm
+./bin/translator <inputfile_name> <outputfile_name>
 ```
+
+Open the .asm file to see the generated Hack instructions.
 
 ## Deployment
 
@@ -105,4 +105,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 
 * Inspired by the Nand2Tetris course
+* Special thanks to Professor Ilinkin for guidance and support
 * Utility functions provided in **token_io**

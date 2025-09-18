@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include <fstream>
-#include "token_io.h"
+using namespace std;
 
 class ArmToHack {
 
