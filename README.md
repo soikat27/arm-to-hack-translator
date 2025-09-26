@@ -33,11 +33,11 @@ g++ --version
 #### 1. Clone this repository and Navigate to the project directory:
 
 ```
-git clone https://github.com/your-username/armToHack-Translator.git
+git clone https://github.com/your-username/arm-to-hack-translator.git
 ```
 
 ```
-cd ArmToHack-Translator
+cd arm-to-hack-translator
 ```
 
 #### 2. Compile the program:
