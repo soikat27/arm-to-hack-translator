@@ -33,7 +33,7 @@ g++ --version
 #### 1. Clone this repository and Navigate to the project directory:
 
 ```
-git clone https://github.com/your-username/arm-to-hack-translator.git
+git clone https://github.com/soikat27/arm-to-hack-translator.git
 ```
 
 ```
